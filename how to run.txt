@@ -1,0 +1,4 @@
+1. Run the FastAPI server (in the terminal): "uvicorn main:app --reload"
+2. Visit: http://127.0.0.1:8000/docs
+3. Click "Try it out" → Upload a PDF → Get plagiarism result
+
