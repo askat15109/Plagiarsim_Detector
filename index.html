@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PDF Plagiarism Checker</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #1e1e2f;
+      color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 50px;
+    }
+
+    .container {
+      background: #2d2d44;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      text-align: center;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    input[type="file"] {
+      margin: 20px 0;
+    }
+
+    button {
+      background: #5a62ea;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #6f78f3;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 1.1em;
+    }
+
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #5a62ea;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      display: none;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>PDF Plagiarism Checker</h1>
+    <input type="file" id="pdfFile" accept=".pdf" />
+    <button type="button" id="checkBtn">Check Plagiarism</button>
+    <div class="loader" id="loader"></div>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const button = document.getElementById("checkBtn");
+      button.addEventListener("click", async (e) => {
+        e.preventDefault(); // Prevent any form-related reload
+
+        const fileInput = document.getElementById("pdfFile");
+        const loader = document.getElementById("loader");
+        const resultDiv = document.getElementById("result");
+
+        if (!fileInput.files.length) {
+          alert("Please select a PDF file.");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+
+        loader.style.display = "block";
+        resultDiv.innerText = "";
+
+        try {
+          const response = await fetch("http://localhost:8000/upload_pdf/", {
+            method: "POST",
+            body: formData
+          });
+
+          const data = await response.json();
+
+          if (data.error) {
+            resultDiv.innerHTML = `<span style="color: red;">❌ ${data.error}</span>`;
+          } else {
+            resultDiv.innerHTML = `<strong>${data.result}</strong>`;
+          }
+        } catch (error) {
+          resultDiv.innerHTML = `<span style="color: red;">Error: ${error.message}</span>`;
+        } finally {
+          loader.style.display = "none";
+        }
+      });
+    });
+  </script>
+</body>
+</html>
